@@ -4,6 +4,7 @@ from random import randrange
 class Problem(ABC):
   def __init__(self) -> None:
     self.inital_state = []
+    self.n = 0
   @abstractmethod
   def goal_test(self, state) -> bool:
     '''
@@ -19,7 +20,7 @@ class Problem(ABC):
     pass
 
   @abstractmethod
-  def g(self, cost, from_state, action):
+  def g(self, from_state, action):
     '''
     Calculate the path cost from one state to another
     '''
@@ -29,13 +30,6 @@ class Problem(ABC):
   def h(self, state):
     '''
     Calculate the heuristic of the specified state
-    '''
-    pass
-
-  @abstractmethod
-  def max_h(self):
-    '''
-    Return the maximum heuristic of the problem
     '''
     pass
 
@@ -69,9 +63,9 @@ class NQueens(Problem):
           actions.append(tuple(new_action))
     return actions
 
-  def g(self, from_state, action) -> int: 
-    # Irrelevant
-    return 0
+  def g(self, from_state, to_state) -> int: 
+    # Path cost = heuristic -> admissible + consistent
+    return self.h(to_state)
   
   def h(self, state: 'tuple[int]'):
     num_conflict = 0
@@ -80,9 +74,6 @@ class NQueens(Problem):
         if self.check_conflict(i, state[i], j, state[j]):
           num_conflict += 1
     return num_conflict
-
-  def max_h(self):
-    return (self.n * (self.n - 1)) / 2
 
   def random_state(self) -> 'tuple[int]':
     return tuple([randrange(0, self.n) for _ in range(self.n)])

@@ -1,7 +1,6 @@
 from problems import Problem
 import heapq
 
-
 class UCS:
   class Node:
     def __init__(self, problem: Problem, state, parent: 'UCS.Node' = None, path_cost=0) -> None:
@@ -15,7 +14,7 @@ class UCS:
       '''
       Return next node from executing specified action
       '''
-      return UCS.Node(self.problem, action, self, self.g + 1)
+      return UCS.Node(self.problem, action, self, self.g + self.problem.g(self.state, action))
 
     def pretty_print(self):
       l = len(self.state)
@@ -50,18 +49,17 @@ class UCS:
 
   def solve(self):
     frontier = [self.root]
-    step = 0
+    # step = 0
     heapq.heapify(frontier)
     explored = set()
     while frontier:
       cur = heapq.heappop(frontier)
       if self.problem.goal_test(cur.state):
-        print(cur.get_path())
         return cur
       if cur.state in explored:
         continue
 
-      step += 1
+      # step += 1
       explored.add(cur.state)
       for action in self.problem.actions(cur.state):
         new_node = cur.child_node(action)

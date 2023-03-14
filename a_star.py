@@ -3,24 +3,18 @@ import heapq
 
 class AStar:
   class Node:
-    def __init__(self, problem: Problem, state, parent: 'AStar.Node' = None) -> None:
+    def __init__(self, problem: Problem, state, parent: 'AStar.Node' = None, path_cost=0) -> None:
       self.problem = problem
       self.state = state
       self.h = problem.h(state)
-      self.g = 0
+      self.g = path_cost + self.h
       self.parent = parent
-
-    # def expand(self):
-    #   '''
-    #   Return a list of child nodes
-    #   '''
-    #   return [self.child_node(action) for action in self.problem.actions(self.state)]
 
     def child_node(self, action):
       '''
       Return next node from executing specified action
       '''
-      return AStar.Node(self.problem, action, self)
+      return AStar.Node(self.problem, action, self, self.h)
 
     def pretty_print(self):
       l = len(self.state)
@@ -55,14 +49,14 @@ class AStar:
     
   def solve(self):
     frontier = [self.root]
-    step = 0
+    # step = 0
     heapq.heapify(frontier)
     explored = set()
     explored.add(self.root.state)
     while frontier:
       cur = heapq.heappop(frontier)
-      print(step, cur.h)
-      step += 1
+      # print(step, cur.h)
+      # step += 1
       if not cur.h:
         return cur
 
