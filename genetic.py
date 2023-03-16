@@ -76,14 +76,4 @@ class Genetic:
 
       del self.population
       self.population = new_population
-      
-      # Choose the best chromosome
-      # best_fitness = 0
-      # best_index = 0
-      # for i, fitness in enumerate(all_fitness):
-      #   if fitness > best_fitness:
-      #     best_fitness = fitness
-      #     best_index = i
-      
-      # best_chromosome = self.population[best_index]
       self.gen += 1

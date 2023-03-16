@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from random import randrange
+import itertools
 
 class Problem(ABC):
   def __init__(self) -> None:
-    self.inital_state = []
+    self.initial_state = []
     self.n = 0
   @abstractmethod
   def goal_test(self, state) -> bool:
@@ -18,9 +19,16 @@ class Problem(ABC):
     Return available actions
     '''
     pass
+  
+  @abstractmethod
+  def result(self, state, action):
+    '''
+    Return state created from an action
+    '''
+    pass
 
   @abstractmethod
-  def g(self, from_state, action):
+  def g(self, from_state, action, to_state):
     '''
     Calculate the path cost from one state to another
     '''
@@ -42,30 +50,25 @@ class Problem(ABC):
 
 class NQueens(Problem):
   def __init__(self, n) -> None:
-    self.inital_state = tuple([randrange(0, n) for _ in range(n)])
+    self.initial_state = tuple([randrange(0, n) for _ in range(n)])
     self.n = n
   
   def check_conflict(self, col1, row1, col2, row2):
     return row1 == row2 or abs(row1 - row2) == abs(col1 - col2)
   
   def goal_test(self, state: 'tuple[int]') -> bool:
-    if self.h(state):
-      return False
-    return True
+    return not self.h(state)
+  
+  def actions(self, state: 'tuple[int]') -> 'tuple[int]':
+    return itertools.filterfalse(lambda x: x[1] == state[x[0]], itertools.product(range(self.n), repeat=2))
+  
+  def result(self, state, action):
+    new_state = list(state)
+    new_state[action[0]] = action[1]
+    return tuple(new_state)
 
-  def actions(self, state: 'tuple[int]') -> 'tuple[list[int]]':
-    actions = []
-    for r in range(self.n):
-      for c in range(self.n):
-        if c != state[r]:
-          new_action = list(state[:])
-          new_action[r] = c
-          actions.append(tuple(new_action))
-    return actions
-
-  def g(self, from_state, to_state) -> int: 
-    # Path cost = heuristic -> admissible + consistent
-    return self.h(to_state)
+  def g(self, from_state, action, to_state) -> int: 
+    return 1
   
   def h(self, state: 'tuple[int]'):
     num_conflict = 0

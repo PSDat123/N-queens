@@ -5,7 +5,7 @@ from genetic import Genetic
 import tracemalloc
 from time import perf_counter_ns
 
-N = 10
+N = 8
 TEST_NUM = 3
 def benchmark(func):
   def calc():
@@ -28,11 +28,8 @@ def benchmark(func):
 
 @benchmark
 def run_a_star():
-
   astar = AStar(NQueens(N))
   astar.solve().pretty_print()
-  # ucs = UCS(NQueens(N))
-  # ucs.solve().pretty_print()
 
 
 @benchmark
@@ -46,6 +43,24 @@ def run_genetic():
   gen.solve(1)
   gen.pretty_print()
 
-run_a_star()
-run_ucs()
-run_genetic()
+try:
+  N = int(input("Enter number of queens N = "))
+except: 
+  print("Invalid input!")
+  exit()
+
+print("1. A*")
+print("2. UCS")
+print("3. Genetic algorithm")
+try:
+  choice = int(input("Your choice: "))
+except:
+  print("Invalid input")
+  exit()
+
+if choice == 1:
+  run_a_star()
+elif choice == 2:
+  run_ucs()
+elif choice == 3:
+  run_genetic()

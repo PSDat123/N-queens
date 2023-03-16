@@ -3,18 +3,17 @@ import heapq
 
 class UCS:
   class Node:
-    def __init__(self, problem: Problem, state, parent: 'UCS.Node' = None, path_cost=0) -> None:
+    def __init__(self, problem: Problem, state, path_cost=0) -> None:
       self.problem = problem
       self.state = state
-      self.h = 0
       self.g = path_cost
-      self.parent = parent
 
     def child_node(self, action):
       '''
       Return next node from executing specified action
       '''
-      return UCS.Node(self.problem, action, self, self.g + self.problem.g(self.state, action))
+      new_state = self.problem.result(self.state, action)
+      return UCS.Node(self.problem, new_state, self.g + self.problem.g(self.state, action, new_state))
 
     def pretty_print(self):
       l = len(self.state)
@@ -26,43 +25,34 @@ class UCS:
             print("* ", end='')
         print()
 
-    def get_path(self):
-      '''
-      Return the path to the current node
-      '''
-      node, path_back = self, []
-      while node:
-        path_back.append(node)
-        node = node.parent
-      path_back.reverse()
-      return path_back
-
     def __repr__(self):
-      return f"UCS Node {self.state}(g={self.g}, h={self.h})>"
+      return f"UCS Node {self.state}(g={self.g})>"
 
     def __lt__(self, other: 'UCS.Node'):
       return self.g < other.g
+    
+    def __hash__(self):
+      return hash(self.state)
+
+    def __eq__(self, other: 'UCS.Node'):
+      return self.state == other.state
 
   def __init__(self, problem: Problem) -> None:
     self.problem = problem
-    self.root = UCS.Node(problem, problem.inital_state)
+    self.root = UCS.Node(problem, problem.initial_state)
 
   def solve(self):
     frontier = [self.root]
-    # step = 0
     heapq.heapify(frontier)
     explored = set()
+    explored.add(self.root.state)
     while frontier:
       cur = heapq.heappop(frontier)
       if self.problem.goal_test(cur.state):
         return cur
-      if cur.state in explored:
-        continue
-
-      # step += 1
-      explored.add(cur.state)
       for action in self.problem.actions(cur.state):
         new_node = cur.child_node(action)
         if new_node.state not in explored:
           heapq.heappush(frontier, new_node)
+          explored.add(new_node.state)
     return None
